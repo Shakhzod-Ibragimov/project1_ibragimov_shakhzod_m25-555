@@ -28,3 +28,4 @@ quit — выход
 
 #Демонстрация (asciinema)
 
+[![asciinema](https://asciinema.org/a/1lvJ7ZoNCLgCRn6L.svg)](https://asciinema.org/a/1lvJ7ZoNCLgCRn6L)
