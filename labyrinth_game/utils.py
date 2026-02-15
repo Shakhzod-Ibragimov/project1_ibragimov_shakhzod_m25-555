@@ -1,9 +1,16 @@
 # labyrinth_game/utils.py
+
 from __future__ import annotations
 
 import math
 
 from labyrinth_game.constants import ROOMS
+
+EVENT_PROBABILITY_MODULO = 10
+RANDOM_EVENTS_COUNT = 3
+
+TRAP_DAMAGE_MODULO = 10
+TRAP_DEATH_THRESHOLD = 3
 
 
 def pseudo_random(seed: int, modulo: int) -> int:
@@ -26,8 +33,8 @@ def trigger_trap(game_state: dict) -> None:
         print(f"Вы потеряли предмет: {lost}")
         return
 
-    roll = pseudo_random(steps, 10)  # 0..9
-    if roll < 3:
+    roll = pseudo_random(steps, TRAP_DAMAGE_MODULO)  # 0..9
+    if roll < TRAP_DEATH_THRESHOLD:
         print("Вы не успели увернуться... Поражение.")
         game_state["game_over"] = True
     else:
@@ -131,10 +138,10 @@ def random_event(game_state: dict) -> None:
     steps = game_state["steps_taken"]
 
     # событие с низкой вероятностью (1 из 10)
-    if pseudo_random(steps, 10) != 0:
+    if pseudo_random(steps, EVENT_PROBABILITY_MODULO) != 0:
         return
 
-    event_type = pseudo_random(steps + 1, 3)  # 0..2
+    event_type = pseudo_random(steps + 1, RANDOM_EVENTS_COUNT)  # 0..2
     room_name = game_state["current_room"]
     room = ROOMS[room_name]
 
