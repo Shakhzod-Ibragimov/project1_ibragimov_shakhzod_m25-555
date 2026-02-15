@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # labyrinth_game/main.py
-
 from __future__ import annotations
 
+from labyrinth_game.constants import COMMANDS
 from labyrinth_game.player_actions import (
     get_input,
     move_player,
@@ -26,9 +26,15 @@ def process_command(game_state: dict, command_line: str) -> None:
     command = parts[0].lower()
     arg = " ".join(parts[1:]).strip().lower()
 
+    directions = {"north", "south", "east", "west"}
+    if command in directions and not arg:
+        # однословное движение
+        move_player(game_state, command)
+        return
+
     match command:
         case "help":
-            show_help()
+            show_help(COMMANDS)
 
         case "look":
             describe_current_room(game_state)
@@ -55,11 +61,10 @@ def process_command(game_state: dict, command_line: str) -> None:
             use_item(game_state, arg)
 
         case "solve":
-            # если мы в сокровищнице — решаем победную логику
             if game_state["current_room"] == "treasure_room":
                 attempt_open_treasure(game_state)
-                return
-            solve_puzzle(game_state)
+            else:
+                solve_puzzle(game_state)
 
         case "quit" | "exit":
             game_state["game_over"] = True

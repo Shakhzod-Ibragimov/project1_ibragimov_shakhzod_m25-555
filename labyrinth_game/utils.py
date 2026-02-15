@@ -1,9 +1,7 @@
 # labyrinth_game/utils.py
-import math
-
 from __future__ import annotations
 
-from labyrinth_game.constants import ROOMS
+import math
 
 from labyrinth_game.constants import ROOMS
 
