@@ -14,6 +14,7 @@ TRAP_DEATH_THRESHOLD = 3
 
 
 def pseudo_random(seed: int, modulo: int) -> int:
+ """Return deterministic pseudo-random int in range [0, modulo)."""
     if modulo <= 0:
         return 0
     x = math.sin(seed * 12.9898) * 43758.5453
@@ -22,6 +23,7 @@ def pseudo_random(seed: int, modulo: int) -> int:
 
 
 def trigger_trap(game_state: dict) -> None:
+    """Trigger a trap event: lose item or possibly end the game."""
     print("Ловушка активирована! Пол стал дрожать...")
 
     inv = game_state["player_inventory"]
@@ -42,6 +44,7 @@ def trigger_trap(game_state: dict) -> None:
 
 
 def describe_current_room(game_state: dict) -> None:
+ """Print current room info: description, items, exits, puzzle hint."""
     room_name = game_state["current_room"]
     room = ROOMS[room_name]
 
@@ -61,6 +64,7 @@ def describe_current_room(game_state: dict) -> None:
 
 
 def show_help(commands: dict) -> None:
+"""Show the list of commands for player"""
     print("\nДоступные команды:")
     for cmd, desc in commands.items():
         # позиционирование слева + 16 пробелов
@@ -68,6 +72,7 @@ def show_help(commands: dict) -> None:
 
 
 def solve_puzzle(game_state: dict) -> None:
+    """Handle puzzle solving in the current room."""
     room_name = game_state["current_room"]
     room = ROOMS[room_name]
 
@@ -94,6 +99,7 @@ def solve_puzzle(game_state: dict) -> None:
 
 
 def attempt_open_treasure(game_state: dict) -> None:
+  """Try to open the treasure chest and possibly end the game with victory."""
     room_name = game_state["current_room"]
     room = ROOMS[room_name]
 
