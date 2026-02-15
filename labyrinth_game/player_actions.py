@@ -1,4 +1,6 @@
 # labyrinth_game/player_actions.py
+from labyrinth_game.utils import describe_current_room, random_event
+
 
 from __future__ import annotations
 
@@ -31,9 +33,21 @@ def move_player(game_state: dict, direction: str) -> None:
         print("Нельзя пойти в этом направлении.")
         return
 
-    game_state["current_room"] = exits[direction]
+    next_room = exits[direction]
+
+    # проверка на вход в treasure_room
+    if next_room == "treasure_room":
+        if "treasure_key" in game_state["player_inventory"]:
+            print("Вы используете найденный ключ, чтобы открыть путь в комнату сокровищ.")
+        else:
+            print("Дверь заперта. Нужен ключ, чтобы пройти дальше.")
+            return
+
+    game_state["current_room"] = next_room
     game_state["steps_taken"] += 1
+
     describe_current_room(game_state)
+    random_event(game_state)
 
 
 def take_item(game_state: dict, item_name: str) -> None:
