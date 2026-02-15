@@ -14,7 +14,7 @@ TRAP_DEATH_THRESHOLD = 3
 
 
 def pseudo_random(seed: int, modulo: int) -> int:
- """Return deterministic pseudo-random int in range [0, modulo)."""
+    """Return deterministic pseudo-random int in range [0, modulo)."""
     if modulo <= 0:
         return 0
     x = math.sin(seed * 12.9898) * 43758.5453
@@ -35,7 +35,7 @@ def trigger_trap(game_state: dict) -> None:
         print(f"Вы потеряли предмет: {lost}")
         return
 
-    roll = pseudo_random(steps, TRAP_DAMAGE_MODULO)  # 0..9
+    roll = pseudo_random(steps, TRAP_DAMAGE_MODULO)
     if roll < TRAP_DEATH_THRESHOLD:
         print("Вы не успели увернуться... Поражение.")
         game_state["game_over"] = True
@@ -44,7 +44,7 @@ def trigger_trap(game_state: dict) -> None:
 
 
 def describe_current_room(game_state: dict) -> None:
- """Print current room info: description, items, exits, puzzle hint."""
+    """Print current room info: description, items, exits, puzzle hint."""
     room_name = game_state["current_room"]
     room = ROOMS[room_name]
 
@@ -60,14 +60,13 @@ def describe_current_room(game_state: dict) -> None:
         print("Выходы:", ", ".join(exits.keys()))
 
     if room["puzzle"] is not None:
-        print('Кажется, здесь есть загадка (используйте команду solve).')
+        print("Кажется, здесь есть загадка (используйте команду solve).")
 
 
 def show_help(commands: dict) -> None:
-"""Show the list of commands for player"""
-    print("\nДоступные команды:")
+    """Show the list of commands for player."""
+    print("\nДоступные команды:\n")
     for cmd, desc in commands.items():
-        # позиционирование слева + 16 пробелов
         print(f"  {cmd:<16} {desc}")
 
 
@@ -85,21 +84,22 @@ def solve_puzzle(game_state: dict) -> None:
     user_answer = input("Ваш ответ: ").strip().lower()
     correct = str(answer).strip().lower()
 
-    if user_answer == correct:
-        print("Верно! Загадка решена.")
-        room["puzzle"] = None  # нельзя решить дважды
+    alternatives = {correct}
+    if correct == "10":
+        alternatives |= {"десять", "ten"}
 
-        # простая награда-пример: в hall после загадки появляется ключ
-        if room_name == "hall" and "treasure_key" not in game_state["player_inventory"]:
-            game_state["player_inventory"].append("treasure_key")
-            print("Вы получаете награду: treasure_key!")
+    if user_answer in alternatives:
+        print("Верно! Загадка решена.")
+        room["puzzle"] = None
         return
 
     print("Неверно. Попробуйте снова.")
+    if room_name == "trap_room":
+        trigger_trap(game_state)
 
 
 def attempt_open_treasure(game_state: dict) -> None:
-  """Try to open the treasure chest and possibly end the game with victory."""
+    """Try to open treasure chest and end the game with victory."""
     room_name = game_state["current_room"]
     room = ROOMS[room_name]
 
@@ -112,8 +112,8 @@ def attempt_open_treasure(game_state: dict) -> None:
         return
 
     inventory = game_state["player_inventory"]
-    if "treasure_key" in inventory:
-        print("Вы применяете ключ, и замок щёлкает. Сундук открыт!")
+    if "golden_key" in inventory:
+        print("Вы применяете golden_key, и замок щёлкает. Сундук открыт!")
         room["items"].remove("treasure_chest")
         print("В сундуке сокровище! Вы победили!")
         game_state["game_over"] = True
@@ -125,7 +125,7 @@ def attempt_open_treasure(game_state: dict) -> None:
         return
 
     if room["puzzle"] is None:
-        print("Кодовая защита отключена, но ключа всё равно нет.")
+        print("Кодовой загадки нет, но ключа всё равно нет.")
         return
 
     _, correct_code = room["puzzle"]
@@ -141,13 +141,13 @@ def attempt_open_treasure(game_state: dict) -> None:
 
 
 def random_event(game_state: dict) -> None:
+    """Run rare random events after movement."""
     steps = game_state["steps_taken"]
 
-    # событие с низкой вероятностью (1 из 10)
     if pseudo_random(steps, EVENT_PROBABILITY_MODULO) != 0:
         return
 
-    event_type = pseudo_random(steps + 1, RANDOM_EVENTS_COUNT)  # 0..2
+    event_type = pseudo_random(steps + 1, RANDOM_EVENTS_COUNT)
     room_name = game_state["current_room"]
     room = ROOMS[room_name]
 
@@ -163,7 +163,6 @@ def random_event(game_state: dict) -> None:
             print("Вы достаёте меч — существо отступает.")
         return
 
-    # event_type == 2: ловушка по условию
     if room_name == "trap_room" and "torch" not in game_state["player_inventory"]:
         print("Опасность! Без факела в этой комнате легко ошибиться...")
         trigger_trap(game_state)

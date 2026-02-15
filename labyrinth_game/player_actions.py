@@ -1,4 +1,5 @@
 # labyrinth_game/player_actions.py
+
 from __future__ import annotations
 
 from labyrinth_game.constants import ROOMS
@@ -6,7 +7,7 @@ from labyrinth_game.utils import describe_current_room, random_event
 
 
 def get_input(prompt: str = "> ") -> str:
-  """Read user input safely; return 'quit' on Ctrl+C/Ctrl+D."""
+    """Read user input safely; return 'quit' on Ctrl+C/Ctrl+D."""
     try:
         return input(prompt).strip()
     except (KeyboardInterrupt, EOFError):
@@ -24,7 +25,7 @@ def show_inventory(game_state: dict) -> None:
 
 
 def move_player(game_state: dict, direction: str) -> None:
- """Move player to another room if possible and update steps."""
+    """Move player to another room if possible and update steps."""
     current_room = game_state["current_room"]
     room_data = ROOMS[current_room]
     exits = room_data["exits"]
@@ -35,12 +36,12 @@ def move_player(game_state: dict, direction: str) -> None:
 
     next_room = exits[direction]
 
-    # проверка на вход в treasure_room
     if next_room == "treasure_room":
-        if "treasure_key" in game_state["player_inventory"]:
-            print("Вы используете найденный ключ,"
-" чтобы открыть путь в комнату сокровищ."
-)
+        if "rusty_key" in game_state["player_inventory"]:
+            print(
+                "Вы используете найденный ключ, чтобы открыть путь "
+                "в комнату сокровищ."
+            )
         else:
             print("Дверь заперта. Нужен ключ, чтобы пройти дальше.")
             return
