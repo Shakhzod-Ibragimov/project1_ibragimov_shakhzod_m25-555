@@ -61,7 +61,6 @@ def show_help(commands: dict) -> None:
         # позиционирование слева + 16 пробелов
         print(f"  {cmd:<16} {desc}")
 
-
 def solve_puzzle(game_state: dict) -> None:
     room_name = game_state["current_room"]
     room = ROOMS[room_name]
@@ -75,17 +74,27 @@ def solve_puzzle(game_state: dict) -> None:
     user_answer = input("Ваш ответ: ").strip().lower()
     correct = str(answer).strip().lower()
 
-    if user_answer == correct:
-        print("Верно! Загадка решена.")
-        room["puzzle"] = None  # нельзя решить дважды
+    # альтернативные варианты
+    alternatives = {correct}
+    if correct == "10":
+        alternatives |= {"десять", "ten"}
 
-        # простая награда-пример: в hall после загадки появляется ключ
+    if user_answer in alternatives:
+        print("Верно! Загадка решена.")
+        room["puzzle"] = None
+
+        # награды зависят от комнаты
         if room_name == "hall" and "treasure_key" not in game_state["player_inventory"]:
-            game_state["player_inventory"].append("treasure_key")
-            print("Вы получаете награду: treasure_key!")
+            # пример: можно дать подсказку/предмет, но ключ у тебя уже в secret_room
+            print("Вы чувствуете, что путь вперед стал яснее...")
+        elif room_name == "trap_room" and "coin" not in game_state["player_inventory"]:
+            game_state["player_inventory"].append("coin")
+            print("Награда: coin!")
         return
 
     print("Неверно. Попробуйте снова.")
+    if room_name == "trap_room":
+        trigger_trap(game_state)
 
 
 def attempt_open_treasure(game_state: dict) -> None:
